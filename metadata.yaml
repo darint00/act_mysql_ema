@@ -1,0 +1,37 @@
+name: emareceiver 
+
+resource_attributes:
+  ema.instance.endpoint:
+    description: Endpoint of the EMA jar 
+    type: string
+
+attributes:
+  buffer_pool_pages:
+    value: kind
+    description: The buffer pool pages types.
+    enum: [data, free, misc]
+  buffer_pool_data:
+    value: status
+    description: The status of buffer pool data.
+    enum: [dirty, clean]
+metrics:
+  ema.buffer_pool.pages:
+    enabled: true
+    description: The number of pages in the InnoDB buffer pool.
+    unit: 1
+    sum:
+      value_type: int
+      input_type: string
+      monotonic: false
+      aggregation: cumulative
+    attributes: [buffer_pool_pages]
+  ema.buffer_pool.data_pages:
+    enabled: true
+    description: The number of data pages in the InnoDB buffer pool.
+    unit: 1
+    sum:
+      value_type: int
+      monotonic: false
+      aggregation: cumulative
+    attributes: [buffer_pool_data]
+

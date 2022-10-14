@@ -1,0 +1,18 @@
+dist:
+  module: actian-otelcol        # Name of Module to generate 
+  name: actian-otelcol          # the binary name. Optional.
+  output_path: ./actian-otelcol # the path to write the output (sources and binary). Optional.
+
+
+exporters:
+  - import: go.opentelemetry.io/collector/exporter/loggingexporter
+    gomod: go.opentelemetry.io/collector v0.61.0
+
+receivers:
+  - import: go.opentelemetry.io/collector/receiver/otlpreceiver
+    gomod: go.opentelemetry.io/collector v0.61.0
+
+processors:
+  - import: go.opentelemetry.io/collector/processor/batchprocessor
+    gomod: go.opentelemetry.io/collector v0.61.0
+

@@ -1,0 +1,20 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+  ema:
+    interval: 5s
+    number_of_traces: 1
+
+processors:
+
+exporters:
+  logging:
+    loglevel: debug
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp,ema]
+      processors: []
+      exporters: [logging]  
