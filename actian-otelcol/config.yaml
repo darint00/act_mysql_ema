@@ -3,8 +3,7 @@ receivers:
     protocols:
       grpc:
   ema:
-    interval: 5s
-    number_of_traces: 1
+    interval: 1m 
 
 processors:
 

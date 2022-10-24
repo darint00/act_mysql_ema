@@ -1,0 +1,5 @@
+github.com/benbjohnson/clock v1.3.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
+github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 h1:I0XW9+e1XWDxdcEniV4rQAIOPUGDq67JSCiRCgGCZLI=
+github.com/open-telemetry/opentelemetry-collector-contrib/internal/scrapertest v0.61.0/go.mod h1:O/r49NIU442OO23otW6uhvzP8Lt4rQg35QqfOgfgQR4=
+go.opentelemetry.io/contrib v0.20.0 h1:ubFQUn0VCZ0gPwIoJfBJVpeBlyRMxu8Mm/huKWYd9p0=
+go.opentelemetry.io/contrib/zpages v0.36.1/go.mod h1:C7wxlG7CEt/VI00b9e3gXrZ27nHnyC8I+fN32QtguWk=

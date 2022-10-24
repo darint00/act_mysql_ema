@@ -26,5 +26,6 @@ type Config struct {
 	Database                                string `mapstructure:"database,omitempty"`
 	AllowNativePasswords                    bool   `mapstructure:"allow_native_passwords,omitempty"`
 	confignet.NetAddr                       `mapstructure:",squash"`
+	Interval                                string          `mapstructure:"interval"`
 	Metrics                                 MetricsSettings `mapstructure:"metrics"`
 }
