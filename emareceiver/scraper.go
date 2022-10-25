@@ -16,10 +16,7 @@ package emareceiver // import "github.com/open-telemetry/opentelemetry-collector
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"net"
-	"strconv"
 	"time"
 
 	"go.opentelemetry.io/collector/component"
@@ -33,18 +30,18 @@ const (
 	picosecondsInNanoseconds int64 = 1000
 )
 
-type mySQLScraper struct {
-	sqlclient client
+type emaScraper struct {
+	emaclient client
 	logger    *zap.Logger
 	config    *Config
 	mb        *MetricsBuilder
 }
 
-func newMySQLScraper(
+func newEmaScraper(
 	settings component.ReceiverCreateSettings,
 	config *Config,
-) *mySQLScraper {
-	return &mySQLScraper{
+) *emaScraper {
+	return &emaScraper{
 		logger: settings.Logger,
 		config: config,
 		mb:     NewMetricsBuilder(config.Metrics, settings.BuildInfo),
@@ -52,14 +49,23 @@ func newMySQLScraper(
 }
 
 // start starts the scraper by initializing the db client connection.
-func (m *mySQLScraper) start(_ context.Context, host component.Host) error {
-	//sqlclient := newMySQLClient(m.config)
+func (m *emaScraper) start(_ context.Context, host component.Host) error {
+
+	//newClient := newEmaClient(m.config)
+	var emaclient emaClient
 
 	//err := sqlclient.Connect()
-	c, err := net.Dial("tcp", "localhost:43034")
+	err := emaclient.Connect(m.config)
+	//err := newClient.Connect()
 	if err != nil {
 		return err
 	}
+
+	c := emaclient.conn
+
+	//m.emaclient := newClient
+
+	fmt.Printf("Typeof c: %T\n", c)
 	fmt.Fprintf(c, "cpuLoad\n")
 	c.SetReadDeadline(time.Now().Add(1 * time.Second))
 	reply := make([]byte, 1024)
@@ -69,67 +75,45 @@ func (m *mySQLScraper) start(_ context.Context, host component.Host) error {
 
 	} else {
 		fmt.Println("Data: ", string(reply))
+		fmt.Println("Connection: ", c)
+		fmt.Printf("Connection Type: %T\n", c)
 	}
 
-	//m.sqlclient = sqlclient
+	time.Sleep(2 * time.Second)
+	//m.emaclient = client
 
 	return nil
 }
 
 // shutdown closes the db connection
-func (m *mySQLScraper) shutdown(context.Context) error {
-	if m.sqlclient == nil {
+func (m *emaScraper) shutdown(context.Context) error {
+	if m.emaclient == nil {
 		return nil
 	}
-	return m.sqlclient.Close()
+	return m.emaclient.Close()
 }
 
 // scrape scrapes the mysql db metric stats, transforms them and labels them into a metric slices.
-func (m *mySQLScraper) scrape(context.Context) (pmetric.Metrics, error) {
-	if m.sqlclient == nil {
-		return pmetric.Metrics{}, errors.New("failed to connect to http client")
-	}
+func (m *emaScraper) scrape(context.Context) (pmetric.Metrics, error) {
 
-	now := pcommon.NewTimestampFromTime(time.Now())
+	fmt.Println("Scraping Data")
+	//time.Sleep((1 * time.Second))
+	// if *m.conn == nil {
+	// 	return pmetric.Metrics{}, errors.New("failed to connect to http client")
+	// }
 
+	fmt.Println("Scraping Data1")
 	errs := &scrapererror.ScrapeErrors{}
+	fmt.Println("Scraping Data2")
 
-	// collect global status metrics.
-	m.scrapeGlobalStats(now, errs)
+	// collect cpuLoad
+	now := pcommon.NewTimestampFromTime(time.Now())
+	fmt.Println("Scraping Data3")
+	m.emaclient.getcpuLoad(now, errs)
+	fmt.Println("Scraping Data4")
 
 	m.mb.EmitForResource(WithMysqlInstanceEndpoint(m.config.Endpoint))
 
 	return m.mb.Emit(), errs.Combine()
-}
-
-func (m *mySQLScraper) scrapeGlobalStats(now pcommon.Timestamp, errs *scrapererror.ScrapeErrors) {
-	globalStats, err := m.sqlclient.getGlobalStats()
-	if err != nil {
-		m.logger.Error("Failed to fetch global stats", zap.Error(err))
-		errs.AddPartial(66, err)
-		return
-	}
-
-	for k, v := range globalStats {
-		switch k {
-
-		// locks
-		case "Table_locks_immediate":
-			addPartialIfError(errs, m.mb.RecordMysqlLocksDataPoint(now, v, AttributeLocksImmediate))
-		case "Table_locks_waited":
-			addPartialIfError(errs, m.mb.RecordMysqlLocksDataPoint(now, v, AttributeLocksWaited))
-
-		}
-	}
-}
-
-func addPartialIfError(errors *scrapererror.ScrapeErrors, err error) {
-	if err != nil {
-		errors.AddPartial(1, err)
-	}
-}
-
-// parseInt converts string to int64.
-func parseInt(value string) (int64, error) {
-	return strconv.ParseInt(value, 10, 64)
+	//return nil, nil
 }

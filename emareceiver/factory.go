@@ -44,8 +44,6 @@ func createDefaultConfig() config.Receiver {
 			ReceiverSettings:   config.NewReceiverSettings(config.NewComponentID(typeStr)),
 			CollectionInterval: time.Duration(defaultInterval.Seconds()),
 		},
-		AllowNativePasswords: true,
-		Username:             "root",
 		NetAddr: confignet.NetAddr{
 			Endpoint:  "localhost:43034",
 			Transport: "tcp",
@@ -62,7 +60,7 @@ func createMetricsReceiver(
 ) (component.MetricsReceiver, error) {
 	cfg := rConf.(*Config)
 
-	ns := newMySQLScraper(params, cfg)
+	ns := newEmaScraper(params, cfg)
 	scraper, err := scraperhelper.NewScraper(typeStr, ns.scrape, scraperhelper.WithStart(ns.start),
 		scraperhelper.WithShutdown(ns.shutdown))
 
