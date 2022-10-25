@@ -51,36 +51,19 @@ func newEmaScraper(
 // start starts the scraper by initializing the db client connection.
 func (m *emaScraper) start(_ context.Context, host component.Host) error {
 
-	//newClient := newEmaClient(m.config)
-	var emaclient emaClient
+	newClient := newEmaClient(m.config)
+	//var emaclient emaClient
 
 	//err := sqlclient.Connect()
-	err := emaclient.Connect(m.config)
-	//err := newClient.Connect()
+	//err := emaclient.Connect(m.config)
+	err := newClient.Connect()
+
 	if err != nil {
 		return err
 	}
 
-	c := emaclient.conn
-
-	//m.emaclient := newClient
-
-	fmt.Printf("Typeof c: %T\n", c)
-	fmt.Fprintf(c, "cpuLoad\n")
-	c.SetReadDeadline(time.Now().Add(1 * time.Second))
-	reply := make([]byte, 1024)
-	_, err = c.Read(reply)
-	if err != nil {
-		fmt.Println("Error : ", err.Error())
-
-	} else {
-		fmt.Println("Data: ", string(reply))
-		fmt.Println("Connection: ", c)
-		fmt.Printf("Connection Type: %T\n", c)
-	}
-
-	time.Sleep(2 * time.Second)
-	//m.emaclient = client
+	//c := emaclient.conn
+	m.emaclient = newClient
 
 	return nil
 }
@@ -102,15 +85,11 @@ func (m *emaScraper) scrape(context.Context) (pmetric.Metrics, error) {
 	// 	return pmetric.Metrics{}, errors.New("failed to connect to http client")
 	// }
 
-	fmt.Println("Scraping Data1")
 	errs := &scrapererror.ScrapeErrors{}
-	fmt.Println("Scraping Data2")
 
 	// collect cpuLoad
 	now := pcommon.NewTimestampFromTime(time.Now())
-	fmt.Println("Scraping Data3")
 	m.emaclient.getcpuLoad(now, errs)
-	fmt.Println("Scraping Data4")
 
 	m.mb.EmitForResource(WithMysqlInstanceEndpoint(m.config.Endpoint))
 

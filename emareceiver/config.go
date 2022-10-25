@@ -15,14 +15,28 @@
 package emareceiver // import "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/mysqlreceiver"
 
 import (
+	"fmt"
+	"time"
+
 	"go.opentelemetry.io/collector/config/confignet"
 	"go.opentelemetry.io/collector/receiver/scraperhelper"
 )
 
 type Config struct {
 	scraperhelper.ScraperControllerSettings `mapstructure:",squash"`
-	Database                                string `mapstructure:"database,omitempty"`
 	confignet.NetAddr                       `mapstructure:",squash"`
 	Interval                                string          `mapstructure:"interval"`
 	Metrics                                 MetricsSettings `mapstructure:"metrics"`
+}
+
+func (cfg *Config) Validate() error {
+	interval, _ := time.ParseDuration(cfg.Interval)
+	if interval.Seconds() < 5 {
+		return fmt.Errorf("interval must be at least 5s")
+	} else {
+		fmt.Println("Ressetting CollectionInterval: ", cfg.Interval)
+		cfg.ScraperControllerSettings.CollectionInterval, _ = time.ParseDuration(cfg.Interval)
+	}
+
+	return nil
 }

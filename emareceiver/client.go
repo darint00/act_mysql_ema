@@ -17,6 +17,7 @@ package emareceiver // import "github.com/open-telemetry/opentelemetry-collector
 import (
 	"fmt"
 	"net"
+	"time"
 
 	"go.opentelemetry.io/collector/config/confignet"
 	"go.opentelemetry.io/collector/pdata/pcommon"
@@ -25,8 +26,8 @@ import (
 )
 
 type client interface {
-	Connect(m *Config) error
-	//Connect() error
+	//Connect(m *Config) error
+	Connect() error
 	getcpuLoad(now pcommon.Timestamp, errs *scrapererror.ScrapeErrors)
 	Close() error
 }
@@ -50,40 +51,36 @@ func newEmaClient(conf *Config) client {
 	}
 }
 
-// func (c *emaClient) Connect() error {
+func (c *emaClient) Connect() error {
 
-// 	var cl net.Conn
-
-// 	cl, err := net.Dial("tcp", "localhost:43034")
-// 	if err != nil {
-// 		return err
-// 	}
-// 	fmt.Printf("client type: %T\n", cl)
-// 	fmt.Printf("c.conn type: %T\n", c.conn)
-// 	c.conn = cl.(*net.TCPConn)
-// 	return nil
-// }
-
-func (c *emaClient) Connect(conf *Config) error {
-
-	var cl net.Conn
-
-	cl, err := net.Dial("tcp", "localhost:43034")
+	newConn, err := net.Dial("tcp", "localhost:43034")
 	if err != nil {
 		return err
 	}
-	fmt.Printf("client type: %T\n", cl)
-	fmt.Printf("c.conn type: %T\n", c.conn)
-	c.conn = cl.(*net.TCPConn)
+	c.conn = newConn.(*net.TCPConn)
+
 	return nil
 }
 
 // getcpuLoad
 func (c *emaClient) getcpuLoad(now pcommon.Timestamp, errs *scrapererror.ScrapeErrors) {
 
-	fmt.Printf("conn: %T\n", c.conn)
+	var err error
+
+	conn := c.conn
 	fmt.Println("In getcpuLoad")
-	//return nil
+
+	fmt.Fprintf(conn, "cpuLoad\n")
+	conn.SetReadDeadline(time.Now().Add(1 * time.Second))
+	reply := make([]byte, 1024)
+	_, err = conn.Read(reply)
+	if err != nil {
+		fmt.Println("Error : ", err.Error())
+
+	} else {
+		fmt.Println("Data: ", string(reply))
+	}
+
 }
 
 func (c *emaClient) Close() error {

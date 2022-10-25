@@ -28,7 +28,7 @@ import (
 const (
 	typeStr         = "ema"
 	stability       = component.StabilityLevelBeta
-	defaultInterval = 1 * time.Minute
+	defaultInterval = 10 * time.Second
 )
 
 func NewFactory() component.ReceiverFactory {
@@ -41,8 +41,10 @@ func NewFactory() component.ReceiverFactory {
 func createDefaultConfig() config.Receiver {
 	return &Config{
 		ScraperControllerSettings: scraperhelper.ScraperControllerSettings{
-			ReceiverSettings:   config.NewReceiverSettings(config.NewComponentID(typeStr)),
-			CollectionInterval: time.Duration(defaultInterval.Seconds()),
+			ReceiverSettings: config.NewReceiverSettings(config.NewComponentID(typeStr)),
+			//CollectionInterval: time.Duration(defaultInterval.Seconds()),
+			//CollectionInterval: 10 * time.Second,
+			CollectionInterval: defaultInterval,
 		},
 		NetAddr: confignet.NetAddr{
 			Endpoint:  "localhost:43034",
@@ -59,6 +61,7 @@ func createMetricsReceiver(
 	consumer consumer.Metrics,
 ) (component.MetricsReceiver, error) {
 	cfg := rConf.(*Config)
+	//	cfg.ScraperControllerSettings.CollectionInterval = cfg.Interval
 
 	ns := newEmaScraper(params, cfg)
 	scraper, err := scraperhelper.NewScraper(typeStr, ns.scrape, scraperhelper.WithStart(ns.start),

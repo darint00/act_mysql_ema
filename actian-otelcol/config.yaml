@@ -3,7 +3,7 @@ receivers:
     protocols:
       grpc:
   ema:
-    interval: 1m 
+    interval: 10s 
 
 processors:
 
