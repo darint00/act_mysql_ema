@@ -17,6 +17,8 @@ package emareceiver // import "github.com/open-telemetry/opentelemetry-collector
 import (
 	"context"
 	"errors"
+	"fmt"
+	"net"
 	"strconv"
 	"time"
 
@@ -51,13 +53,25 @@ func newMySQLScraper(
 
 // start starts the scraper by initializing the db client connection.
 func (m *mySQLScraper) start(_ context.Context, host component.Host) error {
-	sqlclient := newMySQLClient(m.config)
+	//sqlclient := newMySQLClient(m.config)
 
-	err := sqlclient.Connect()
+	//err := sqlclient.Connect()
+	c, err := net.Dial("tcp", "localhost:43034")
 	if err != nil {
 		return err
 	}
-	m.sqlclient = sqlclient
+	fmt.Fprintf(c, "cpuLoad\n")
+	c.SetReadDeadline(time.Now().Add(1 * time.Second))
+	reply := make([]byte, 1024)
+	_, err = c.Read(reply)
+	if err != nil {
+		fmt.Println("Error : ", err.Error())
+
+	} else {
+		fmt.Println("Data: ", string(reply))
+	}
+
+	//m.sqlclient = sqlclient
 
 	return nil
 }

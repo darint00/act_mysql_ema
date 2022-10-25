@@ -47,7 +47,7 @@ func createDefaultConfig() config.Receiver {
 		AllowNativePasswords: true,
 		Username:             "root",
 		NetAddr: confignet.NetAddr{
-			Endpoint:  "localhost:3306",
+			Endpoint:  "localhost:43034",
 			Transport: "tcp",
 		},
 		Metrics: DefaultMetricsSettings(),
