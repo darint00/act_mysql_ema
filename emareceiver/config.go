@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package emareceiver // import "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/mysqlreceiver"
+package emareceiver // import "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/emareceiver"
 
 import (
 	"fmt"
@@ -25,7 +25,7 @@ import (
 type Config struct {
 	scraperhelper.ScraperControllerSettings `mapstructure:",squash"`
 	confignet.NetAddr                       `mapstructure:",squash"`
-	Interval                                string          `mapstructure:"interval"`
+	Interval                                string          `mapstructure:"collection_interval"`
 	Metrics                                 MetricsSettings `mapstructure:"metrics"`
 }
 

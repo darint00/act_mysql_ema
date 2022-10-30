@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package emareceiver // import "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/mysqlreceiver"
+package emareceiver // import "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/emareceiver"
 
 import (
 	"fmt"
@@ -20,15 +20,14 @@ import (
 	"time"
 
 	"go.opentelemetry.io/collector/config/confignet"
-	"go.opentelemetry.io/collector/pdata/pcommon"
-	"go.opentelemetry.io/collector/receiver/scrapererror"
 	// registers the mysql driver
 )
 
 type client interface {
 	//Connect(m *Config) error
 	Connect() error
-	getcpuLoad(now pcommon.Timestamp, errs *scrapererror.ScrapeErrors)
+	//getcpuLoad(now pcommon.Timestamp, errs *scrapererror.ScrapeErrors)
+	getcpuLoad() (string, error)
 	Close() error
 }
 
@@ -63,12 +62,13 @@ func (c *emaClient) Connect() error {
 }
 
 // getcpuLoad
-func (c *emaClient) getcpuLoad(now pcommon.Timestamp, errs *scrapererror.ScrapeErrors) {
+//func (c *emaClient) getcpuLoad(now pcommon.Timestamp, errs *scrapererror.ScrapeErrors) {
+func (c *emaClient) getcpuLoad() (string, error) {
 
 	var err error
 
 	conn := c.conn
-	fmt.Println("In getcpuLoad")
+	fmt.Println("DEBUG: In getcpuLoad")
 
 	fmt.Fprintf(conn, "cpuLoad\n")
 	conn.SetReadDeadline(time.Now().Add(1 * time.Second))
@@ -80,7 +80,8 @@ func (c *emaClient) getcpuLoad(now pcommon.Timestamp, errs *scrapererror.ScrapeE
 	} else {
 		fmt.Println("Data: ", string(reply))
 	}
-
+	//return "cpuload=5.4", err
+	return "5", err
 }
 
 func (c *emaClient) Close() error {

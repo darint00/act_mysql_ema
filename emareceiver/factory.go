@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package emareceiver // import "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/mysqlreceiver"
+package emareceiver // import "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/emareceiver"
 
 import (
 	"context"
@@ -61,7 +61,6 @@ func createMetricsReceiver(
 	consumer consumer.Metrics,
 ) (component.MetricsReceiver, error) {
 	cfg := rConf.(*Config)
-	//	cfg.ScraperControllerSettings.CollectionInterval = cfg.Interval
 
 	ns := newEmaScraper(params, cfg)
 	scraper, err := scraperhelper.NewScraper(typeStr, ns.scrape, scraperhelper.WithStart(ns.start),

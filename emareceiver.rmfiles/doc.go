@@ -14,4 +14,4 @@
 
 //go:generate mdatagen metadata.yaml
 
-package emareceiver // import "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/mysqlreceiver"
+package emareceiver // import "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/emareceiver"

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package emareceiver // import "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/mysqlreceiver"
+package emareceiver // import "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/emareceiver"
 
 import (
 	"context"
@@ -79,7 +79,7 @@ func (m *emaScraper) shutdown(context.Context) error {
 // scrape scrapes the mysql db metric stats, transforms them and labels them into a metric slices.
 func (m *emaScraper) scrape(context.Context) (pmetric.Metrics, error) {
 
-	fmt.Println("Scraping Data")
+	fmt.Println("DEBUG: Scraping Data")
 	//time.Sleep((1 * time.Second))
 	// if *m.conn == nil {
 	// 	return pmetric.Metrics{}, errors.New("failed to connect to http client")
@@ -89,7 +89,13 @@ func (m *emaScraper) scrape(context.Context) (pmetric.Metrics, error) {
 
 	// collect cpuLoad
 	now := pcommon.NewTimestampFromTime(time.Now())
-	m.emaclient.getcpuLoad(now, errs)
+	//m.emaclient.getcpuLoad(now, errs)
+	getcpuLoadStats, err := m.emaclient.getcpuLoad()
+	if err != nil {
+		m.logger.Error("Failed to fetch global stats", zap.Error(err))
+	} else {
+		m.mb.RecordVectorhCpuLoadDataPoint(now, getcpuLoadStats, errs)
+	}
 
 	m.mb.EmitForResource(WithMysqlInstanceEndpoint(m.config.Endpoint))
 

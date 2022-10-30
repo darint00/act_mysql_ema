@@ -3,13 +3,21 @@ receivers:
     protocols:
       grpc:
   ema:
-    interval: 10s 
+    collection_interval: 5s 
+    metrics:
+      vectorh.cpuload:
+        enabled: false 
+      # vectorh.connectedSessions.connect_count:
+      #   enabled: true
+      # vectorh.connectedSessions.connect_limit:
+      #   enabled: true
+
 
 processors:
 
 exporters:
   logging:
-    loglevel: debug
+    loglevel: debug 
 
 service:
   pipelines:
