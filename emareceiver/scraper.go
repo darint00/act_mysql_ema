@@ -49,13 +49,13 @@ func newEmaScraper(
 }
 
 // start starts the scraper by initializing the db client connection.
-func (m *emaScraper) start(_ context.Context, host component.Host) error {
+func (s *emaScraper) start(_ context.Context, host component.Host) error {
 
-	newClient := newEmaClient(m.config)
+	newClient := newEmaClient(s.config)
 	//var emaclient emaClient
 
 	//err := sqlclient.Connect()
-	//err := emaclient.Connect(m.config)
+	//err := emaclient.Connect(s.config)
 	err := newClient.Connect()
 
 	if err != nil {
@@ -63,25 +63,25 @@ func (m *emaScraper) start(_ context.Context, host component.Host) error {
 	}
 
 	//c := emaclient.conn
-	m.emaclient = newClient
+	s.emaclient = newClient
 
 	return nil
 }
 
 // shutdown closes the db connection
-func (m *emaScraper) shutdown(context.Context) error {
-	if m.emaclient == nil {
+func (s *emaScraper) shutdown(context.Context) error {
+	if s.emaclient == nil {
 		return nil
 	}
-	return m.emaclient.Close()
+	return s.emaclient.Close()
 }
 
 // scrape scrapes the mysql db metric stats, transforms them and labels them into a metric slices.
-func (m *emaScraper) scrape(context.Context) (pmetric.Metrics, error) {
+func (s *emaScraper) scrape(context.Context) (pmetric.Metrics, error) {
 
 	fmt.Println("DEBUG: Scraping Data")
 	//time.Sleep((1 * time.Second))
-	// if *m.conn == nil {
+	// if *s.conn == nil {
 	// 	return pmetric.Metrics{}, errors.New("failed to connect to http client")
 	// }
 
@@ -89,16 +89,16 @@ func (m *emaScraper) scrape(context.Context) (pmetric.Metrics, error) {
 
 	// collect cpuLoad
 	now := pcommon.NewTimestampFromTime(time.Now())
-	//m.emaclient.getcpuLoad(now, errs)
-	getcpuLoadStats, err := m.emaclient.getcpuLoad()
+	//s.emaclient.getcpuLoad(now, errs)
+	getcpuLoadStats, err := s.emaclient.getcpuLoad()
 	if err != nil {
-		m.logger.Error("Failed to fetch global stats", zap.Error(err))
+		s.logger.Error("Failed to fetch global stats", zap.Error(err))
 	} else {
-		m.mb.RecordVectorhCpuLoadDataPoint(now, getcpuLoadStats, errs)
+		s.mb.RecordVectorhCpuLoadDataPoint(now, getcpuLoadStats, errs)
 	}
 
-	m.mb.EmitForResource(WithMysqlInstanceEndpoint(m.config.Endpoint))
+	s.mb.EmitForResource(WithMysqlInstanceEndpoint(s.config.Endpoint))
 
-	return m.mb.Emit(), errs.Combine()
+	return s.mb.Emit(), errs.Combine()
 	//return nil, nil
 }
