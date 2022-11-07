@@ -16,7 +16,9 @@ package emareceiver // import "github.com/open-telemetry/opentelemetry-collector
 
 import (
 	"fmt"
+	"math/rand"
 	"net"
+	"strconv"
 	"time"
 
 	"go.opentelemetry.io/collector/config/confignet"
@@ -42,6 +44,9 @@ type emaClient struct {
 }
 
 var _ client = (*emaClient)(nil)
+
+var gl_val = "12.23"
+var gl_val_increase = true
 
 func newEmaClient(conf *Config) client {
 
@@ -81,7 +86,30 @@ func (c *emaClient) getcpuLoad() (string, error) {
 		fmt.Println("Data: ", string(reply))
 	}
 	//return "cpuload=5.4", err
-	return "5", err
+	fluctuate_val(&gl_val)
+	return gl_val, err
+}
+
+func fluctuate_val(var1 *string) {
+
+	var2, _ := strconv.ParseFloat(*var1, 32)
+	fmt.Println("Fluctuate: var2: ", var2)
+	if var2 > 15.00 {
+		fmt.Println("Fluctuate:  Ressetting increase to FALSE")
+		gl_val_increase = false
+	}
+	if var2 < 9.00 {
+		fmt.Println("Fluctuate:  Ressetting increase to TRUE")
+		gl_val_increase = true
+	}
+
+	if gl_val_increase {
+		var2 += rand.Float64()
+	} else {
+		var2 -= rand.Float64()
+	}
+
+	*var1 = fmt.Sprintf("%f", var2)
 }
 
 func (c *emaClient) Close() error {

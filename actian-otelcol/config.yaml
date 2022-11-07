@@ -6,7 +6,7 @@ receivers:
     collection_interval: 5s 
     metrics:
       vectorh.cpuload:
-        enabled: false 
+        enabled: true 
       # vectorh.connectedSessions.connect_count:
       #   enabled: true
       # vectorh.connectedSessions.connect_limit:
@@ -18,10 +18,14 @@ processors:
 exporters:
   logging:
     loglevel: debug 
+  otlp:
+    endpoint: 0.0.0.0:4320
+    tls:
+      insecure: true
 
 service:
   pipelines:
     metrics:
       receivers: [otlp,ema]
       processors: []
-      exporters: [logging]  
+      exporters: [logging,otlp]  

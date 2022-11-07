@@ -4,6 +4,7 @@ package main
 
 import (
 	"go.opentelemetry.io/collector/component"
+	otlpexporter "go.opentelemetry.io/collector/exporter/otlpexporter"
 	loggingexporter "go.opentelemetry.io/collector/exporter/loggingexporter"
 	batchprocessor "go.opentelemetry.io/collector/processor/batchprocessor"
 	otlpreceiver "go.opentelemetry.io/collector/receiver/otlpreceiver"
@@ -30,6 +31,7 @@ func components() (component.Factories, error) {
 
 	factories.Exporters, err = component.MakeExporterFactoryMap(
 		loggingexporter.NewFactory(),
+		otlpexporter.NewFactory(),
 	)
 	if err != nil {
 		return component.Factories{}, err
