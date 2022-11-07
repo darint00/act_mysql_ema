@@ -4,6 +4,7 @@ receivers:
       grpc:
   ema:
     collection_interval: 5s 
+    endpoint: localhost:43034
     metrics:
       vectorh.cpuload:
         enabled: true 

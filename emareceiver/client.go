@@ -57,7 +57,8 @@ func newEmaClient(conf *Config) client {
 
 func (c *emaClient) Connect() error {
 
-	newConn, err := net.Dial("tcp", "localhost:43034")
+	//newConn, err := net.Dial("tcp", "localhost:43034")
+	newConn, err := net.Dial(c.NetAddr.Transport, c.NetAddr.Endpoint)
 	if err != nil {
 		return err
 	}
